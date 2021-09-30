@@ -7,7 +7,6 @@ I was trying to port Kiki KaiKai to the Sega Genesis and came up with this to te
 This code includes:
   - starfield generation
   - asset management (sprite count remains under the system limit)
-  - player controls
   - rudimentary SFX engine using the PSG channels (basically switches channels if one is being used)
   - player movement and controls
   - collision detection (non functional, direct port of the java program I wrote)
@@ -20,4 +19,4 @@ This code includes:
 
 
  Notes:
-  - uses the ASCII graphics from BEX for graphics
+  - uses the ASCII tileset from BEX for graphics
