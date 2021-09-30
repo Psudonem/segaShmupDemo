@@ -1,0 +1,314 @@
+ RANDOMIZE 4
+
+
+ 
+ print "SHOOTING DEMO 909crime 2021" 
+ 
+ do
+ 
+ loop until joypad().4 
+ 
+ cls
+ 
+ 
+ SETGFXPLANE SCROLL_A
+ for y = 0 to 28
+ 	for x = 0 to 60
+ 		z = RND(30)
+ 		if z = 3 then drawtile 46, x,y
+ 	next x
+ next y
+ 
+ SETGFXPLANE SCROLL_B
+ 
+ for y = 0 to 28
+ 	for x = 0 to 60
+ 		z = RND(60)
+ 		if z = 3 then drawtile 46, x,y
+ 	next x
+ next y
+ 
+ missilemax=19
+ dim player(10) as integer
+ 
+ dim missiles(19,5) as integer
+ 
+ dim sfx_list(3) as integer
+ 
+ dim currentMissile as integer
+ 
+ dim enemies(10,10) as integer
+ 
+ enemax = 9
+ currentEn = 0
+ 
+ for i = 0 to enemax
+ 	enemies(i,0)=addsprite(2,2)
+ 	propsprite enemies(i,0),10,2
+ 	enemies(i,1)=0' is alive?
+ 	
+ 	enemies(i,2)= 0 ' x
+ 	enemies(i,3)= 0 ' y
+ 	
+ 	enemies(i,4)= 0 'vvelocity 
+ 	enemies(i,5)= 0 'vneg
+ 	
+ 	enemies(i,6)= 0 'hvelocity 
+ 	enemies(i,7)= 0 'hneg
+ next i
+ 
+ 
+ 
+ press = 0
+ 
+ currentMissile = 0
+ missilemax=19
+ 
+ player(0)=addsprite(1,1)
+ propsprite player(0),1,1
+ 
+ player(1)=100 ' x
+ player(2)=100 ' y
+ player(3)=0 ' vvelocity
+ player(4)=0 ' vneg
+ player(5)=0 ' hvelocity
+ player(6)=0 ' hneg
+ 
+ for i = 0 to missilemax
+ 	missiles(i,0) = addsprite(1,1)
+ 	propsprite missiles(i,0),4,1
+ 	missiles(i,1)= 0
+ 	' 0 = sprite index
+ 	' 1 is it alive?
+ 	' 2 x
+ 	' 3 y
+ 	' 4 hspeed
+ 	' 5 vspeed
+ 	
+ 	
+ 	missiles(i,2)= 0 
+ 	missiles(i,3)= 0 
+ next i
+ 
+ do
+ 	SetScrollplane SCROLL_A
+ 	Scroll LEFT, 3
+ 	SetScrollplane SCROLL_B
+ 	Scroll LEFT, 1
+ 	
+ 	movesprite player(0),player(1)+128,player(2)+128
+ 	
+ 	if joypad().4 then
+ 		if press = 1 then press = 2
+ 		if press = 0 then press = 1
+ 	else
+ 		press = 0 
+ 	end if
+ 	
+ 	
+ 	if press = 1 then
+ 		
+ 		if missiles(currentMissile,1)=0 then
+ 			gosub 10
+ 			propsprite missiles(currentMissile,0),4,1
+ 			missiles(currentMissile,1)=1
+ 			missiles(currentMissile,2)=player(1)+8
+ 			missiles(currentMissile,3)=player(2)
+ 			missiles(currentMissile,4)=5
+ 		end if
+ 		currentMissile = currentMissile+1
+ 		
+ 		
+ 		
+ 		
+ 		
+ 	endif
+ 	
+ 	
+ 	if currentMissile>missilemax then currentMissile=0
+ 	
+ 	for i = 0 to missilemax
+ 		if missiles(i,1)=1 then
+ 		
+ 			
+ 			movesprite missiles(i,0), missiles(i,2)+128, missiles(i,3)+128
+ 			missiles(i,2)=missiles(i,2)+missiles(i,4)
+ 			missiles(i,3)=missiles(i,3)+missiles(i,5)
+ 			
+ 			if missiles(i,2)>320 then
+ 				freesprite missiles(i,0)
+ 				missiles(i,1)=0
+ 			end if
+ 			
+ 			
+ 			
+ 			for e = 0 to enemax
+ 				if enemies(e,1)=1 then
+ 					'if collision(missiles(i,0),player(0)) then
+ 					
+ 					'	freesprite missiles(i,0)
+ 				'		missiles(i,1)=0
+ 					
+ 						'freesprite enemies(i,0)
+ 						'enemies(e,1)=0
+ 					'end if
+ 				end if
+ 			next e
+ 			
+ 		endif
+ 	next i 
+ 	gosub playerControls
+ 	gosub enemengine
+ 	
+ 	gosub 20
+ 	sleep 1
+ loop
+enemengine:
+
+	
+	
+	
+	for i = 0 to enemax
+
+		z = RND(300)
+		
+		if z = 1 then
+			
+			
+			if enemies(currentEn,1) = 0 then
+				b = rnd(20)
+				enemies(currentEn,1)=1
+				enemies(currentEn,2)=240
+				
+				enemies(currentEn,3)=b*20
+				enemies(currentEn,4)=1 ' VERTICAL VELOCITY
+				enemies(currentEn,5)=1' hvelocity
+				enemies(currentEn,6)=1' hneg
+				enemies(currentEn,7)=0' VNEG
+				
+				
+				
+				
+				if player(2)>enemies(currentEn,3) then
+					enemies(currentEn,7)=0
+				else if player(2)<enemies(currentEn,3) then
+					enemies(currentEn,7)=1
+				end if
+				
+				
+			end if
+			
+			
+			
+			currentEn=currentEn+1
+			if currentEn>9 then currentEn=0
+				
+				
+		end if
+		
+		
+		if enemies(i,1) = 1 then
+			movesprite enemies(i,0),enemies(i,2)+128, enemies(i,3)+128
+			
+			if enemies(i,6)=1 then 'if horizontal velocity is negative
+				enemies(i,2)=enemies(i,2)-enemies(i,5)
+			else if enelies(i,6) then
+				enemies(i,2)=enemies(i,2)+enemies(i,5)
+			end if
+			
+			if enemies(i,7)=1 then
+				enemies(i,3)=enemies(i,3)-enemies(i,4)
+			else if enemies(i,7)=0 then
+				enemies(i,3)=enemies(i,3)+enemies(i,4)
+			end if
+			
+		end if 
+		
+	next i
+
+
+ return
+playerControls:
+	if player(3)>0 then
+		player(3)=player(3)-1
+	end if
+	if player(5)>0 then
+		player(5)=player(5)-1
+	end if
+	
+	
+	if joypad().3 then
+		player(5)=4
+		player(6)=0
+	end if
+	
+	
+	if joypad().2 then
+		player(5)=4
+		player(6)=1
+	end if
+	
+	
+	if joypad().1 then
+		player(3)=4
+		player(4)=0
+	end if
+	
+	if joypad().0 then
+		player(3)=4
+		player(4)=1
+	end if
+	
+	if player(6) = 0 then
+		player(1)=player(1)+player(5)
+	end if
+	
+	if player(6) = 1 then
+		player(1)=player(1)-player(5)
+	end if
+	
+	if player(4) = 0 then
+		player(2)=player(2)+player(3)
+	end if
+	
+	if player(4) = 1 then
+		player(2)=player(2)-player(3)
+	end if
+	
+	
+ return
+10
+	for s = 0 to 2
+		if sfx_list(s) = 0 then
+			sfx_list(s)=4
+			return
+		end if
+	next s
+ return
+
+
+20
+	for s = 0 to 2
+		psgvol s, sfx_list(s)
+		psg s, 169*s
+		if sfx_list(s)>0 then sfx_list(s)=sfx_list(s)-1
+	next s
+ return
+Declare function collisionProper(l1_x as integer, l1_y as integer, r1_x as integer, r1_y as integer,l2_x as integer, l2_y as integer, r2_x as integer, r2_y as integer)
+
+
+
+	'if l1_x >= l2_x  AND l1_x <= r2_x AND l1_y >= l2_y AND l1_y <= r2_y then return true
+	if l1_x >= l2_x AND l1_x <= r2_x AND l1_y >= l2_y AND l1_y <= r2_y then return true
+	
+	
+	if l1_x >= l2_x AND l1_x <= r2_x AND r1_y >= l2_y AND r1_y <= r2_y then return true
+	
+	if r1_x >= l2_x AND r1_x <= r2_x AND r1_y >= l2_y AND r1_y <= r2_y then return true
+	
+	if r1_x >= l2_x AND r1_x <= r2_x AND l1_y >= l2_y AND l1_y <= r2_y then return true
+	
+	if l1_x>l2_x AND r1_x<r2_x AND l1_y<l2_y AND r1_y> r2_y then return true
+	
+	return false 
+end function
